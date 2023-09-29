@@ -1,10 +1,6 @@
-// App.tsx
-import React from "react";
 import { UserProvider } from "./context/UserContext";
 import UserTable from "./components/UserTable";
-import Login from "./components/Login";
-import Menu from "./components/Menu";
-
+import { Header } from "./components/Header";
 import "./App.css";
 
 function App() {
@@ -12,8 +8,7 @@ function App() {
     <UserProvider>
       <div className="App">
         <main>
-          <Login />
-          <Menu />
+          <Header />
           <UserTable />
         </main>
       </div>

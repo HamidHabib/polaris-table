@@ -1,90 +1,71 @@
-import React, { useState, useEffect } from "react";
-import DataTable from "react-data-table-component";
-import InfiniteScroll from "react-infinite-scroll-component";
-import sampleData from "../data.json";
+import React from "react";
+import {
+  DataGridPro,
+  GridColDef,
+  GridValueGetterParams,
+} from "@mui/x-data-grid-pro";
 
-interface UserData {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  city: string;
-  registeredDate: string;
-  isPrivate: boolean;
-}
+import sampleData from "../data.json";
+import { useUser } from "../context/UserContext";
 
 const UserTable: React.FC = () => {
-  const [data, setData] = useState<UserData[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  const { user } = useUser();
 
-  const columns = [
+  function getFullName(params: GridValueGetterParams) {
+    return `${params.row.firstName || ""} ${params.row.lastName || ""}`;
+  }
+
+  function getIsPrivate(params: GridValueGetterParams) {
+    return `${params.row.isPrivate ? "Private" : "Public"}`;
+  }
+
+  const columns: GridColDef[] = [
     {
-      name: "ID",
-      selector: (row: any) => row.id,
-      sortable: true,
+      field: "id",
+      headerName: "ID",
     },
+
     {
-      name: "First Name",
-      selector: (row: any) => row.firstName,
-      sortable: true,
+      field: "firstName",
+      headerName: "First name",
     },
+
     {
-      name: "Last Name",
-      selector: (row: any) => row.lastName,
-      sortable: true,
+      field: "lastName",
+      headerName: "Last name",
     },
+
     {
-      name: "Email",
-      selector: (row: any) => row.email,
-      sortable: true,
+      field: "email",
+      headerName: "Email",
+      width: 300,
     },
+
     {
-      name: "City",
-      selector: (row: any) => row.city,
-      sortable: true,
+      field: "city",
+      headerName: "City",
+      width: 200,
     },
+
     {
-      name: "Registered Date",
-      selector: (row: any) => row.registeredDate,
-      sortable: true,
+      field: "registeredDate",
+      headerName: "Registered Date",
+      width: 200,
     },
+
     {
-      name: "Is Private",
-      selector: (row: any) => row.isPrivate,
-      sortable: true,
+      field: "isPrivate",
+      headerName: "Is Private",
+      valueGetter: getIsPrivate,
     },
+
     {
-      name: "Full Name",
-      selector: (row: any) => row.fullName,
-      sortable: true,
-      cell: (row: UserData) => `${row.firstName} ${row.lastName}`,
+      field: "Full name",
+      headerName: "Full name",
+      valueGetter: getFullName,
+      width: 200,
     },
   ];
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const startIndex = (currentPage - 1) * 10;
-        const endIndex = startIndex + 10;
-        const newDataChunk = sampleData.slice(startIndex, endIndex);
-
-        if (endIndex >= sampleData.length) {
-          setHasMore(false);
-        }
-
-        setData((prevData) => [...prevData, ...newDataChunk]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, [currentPage]);
-
-  const loadMoreData = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -99,26 +80,37 @@ const UserTable: React.FC = () => {
           </p>
         </div>
       </div>
+
+      {user && (
+        <>
+          <button className=" mt-2 mr-2 rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            Save
+          </button>
+
+          <button className=" mt-2 rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            Load
+          </button>
+        </>
+      )}
       <div className="mt-8 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <InfiniteScroll
-                dataLength={data.length}
-                next={loadMoreData}
-                hasMore={hasMore}
-                loader={<h4 className="text-center my-4">Loading...</h4>}
-                endMessage={
-                  <p className="text-center my-4">No more data to load</p>
-                }
-              >
-                <DataTable
-                  columns={columns}
-                  data={data}
-                  className="min-w-full divide-y divide-gray-300"
-                  noHeader
-                />
-              </InfiniteScroll>
+              <DataGridPro
+                {...sampleData}
+                loading={sampleData.rows.length === 0}
+                columns={columns}
+                rowHeight={38}
+                checkboxSelection
+                pagination={true}
+                disableRowSelectionOnClick
+                autosizeOptions={{
+                  columns: columns.map((column) => column.field),
+                  includeOutliers: true,
+                  includeHeaders: true,
+                }}
+                disableColumnMenu={true}
+              />
             </div>
           </div>
         </div>
