@@ -24,7 +24,7 @@ export const Header = () => {
 
   return (
     <>
-      <header className="bg-white">
+      <header className="bg-white pb-3">
         <div className="mt-6 pr-9 pt-3 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-3 sm:space-y-0 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
           <div className="md:flex md:items-center md:justify-between md:space-x-5">
             <div className="flex items-start space-x-5">
@@ -78,8 +78,8 @@ export const Header = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
+                    {error && <p className="text-red-500 mt-2">{error}</p>}
                   </div>
-                  {error && <p className="text-red-500 mt-2">{error}</p>}
 
                   <button
                     onClick={handleLogin}
